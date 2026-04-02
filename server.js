@@ -99,5 +99,15 @@ app.post('/api/chat', async (req, res) => {
   res.end();
 });
 
+// ルート("/") にアクセスされたときに company.html を返す
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'company.html'));
+});
+
+// /company.html にアクセスされたときも同じファイルを返す
+app.get('/company.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'company.html'));
+});
+
 // サーバー起動
 export default app;
