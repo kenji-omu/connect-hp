@@ -100,7 +100,4 @@ app.post('/api/chat', async (req, res) => {
 });
 
 // サーバー起動
-app.listen(PORT, () => {
-  console.log(`\n🚀 connect HP が起動しました`);
-  console.log(`   → http://localhost:${PORT}/company.html\n`);
-});
+export default app;
