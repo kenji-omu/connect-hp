@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "company-hp",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["/Users/omu/Desktop/my-hp/server.js"],
+      "port": 3000
+    }
+  ]
+}

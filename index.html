@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大室賢時 — AI Engineer</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #020205;
+      --surface: #08080f;
+      --surface2: #0d0d1a;
+      --border: #161626;
+      --border2: #1e1e35;
+      --accent: #7c3aed;
+      --accent2: #06b6d4;
+      --accent-glow: rgba(124,58,237,0.35);
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --nav-h: 72px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ==============================
+       ナビゲーション
+    ============================== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--nav-h);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      background: rgba(2, 2, 5, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s;
+    }
+
+    .nav-logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-cta {
+      padding: 8px 20px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), #9333ea);
+      color: #fff !important;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s !important;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px var(--accent-glow) !important;
+    }
+
+    /* ハンバーガーメニュー（スマホ） */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--muted);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* ==============================
+       ヒーローセクション
+    ============================== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: calc(var(--nav-h) + 80px) 48px 80px;
+      overflow: hidden;
+    }
+
+    /* 背景グロー */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: -10%;
+      width: 55%;
+      height: 70%;
+      background: radial-gradient(ellipse, rgba(124,58,237,0.18) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -20%;
+      right: -10%;
+      width: 50%;
+      height: 60%;
+      background: radial-gradient(ellipse, rgba(6,182,212,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    /* グリッドライン背景 */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 900px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.25);
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #a78bfa;
+      letter-spacing: 0.06em;
+      margin-bottom: 32px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent2);
+      box-shadow: 0 0 8px var(--accent2);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 7vw, 6rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 .line-white {
+      display: block;
+      background: linear-gradient(135deg, #fff 0%, #c4b5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero h1 .line-gradient {
+      display: block;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 1.2rem;
+      line-height: 1.8;
+      color: #94a3b8;
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    .hero-desc strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #9333ea);
+      color: #fff;
+      box-shadow: 0 4px 24px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 8px 32px rgba(124,58,237,0.55);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: #94a3b8;
+    }
+
+    .btn-secondary:hover {
+      border-color: #334155;
+      color: var(--text);
+    }
+
+    /* スクロールダウンインジケーター */
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      animation: bounce 2s infinite;
+    }
+
+    .scroll-hint svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--muted);
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ==============================
+       共通セクションスタイル
+    ============================== */
+    section {
+      padding: 120px 48px;
+    }
+
+    .section-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: #94a3b8;
+      max-width: 600px;
+      margin-bottom: 64px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ==============================
+       アバウトセクション
+    ============================== */
+    #about {
+      background: var(--surface);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .about-visual {
+      position: relative;
+    }
+
+    .about-card {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+    }
+
+    .about-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      box-shadow: 0 0 40px var(--accent-glow);
+    }
+
+    .about-name {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .about-role {
+      color: #a78bfa;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+
+    .about-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .meta-item svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .about-content h3 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .about-content p {
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: #94a3b8;
+      margin-bottom: 20px;
+    }
+
+    .about-content p strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 20px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* ==============================
+       スキルセクション
+    ============================== */
+    #skills {
+      background: var(--bg);
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .skill-category {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .skill-category:hover {
+      border-color: rgba(124,58,237,0.4);
+      transform: translateY(-4px);
+    }
+
+    .skill-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+    }
+
+    .skill-icon.purple { background: rgba(124,58,237,0.15); }
+    .skill-icon.cyan   { background: rgba(6,182,212,0.12); }
+    .skill-icon.pink   { background: rgba(236,72,153,0.12); }
+
+    .skill-category h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .skill-category p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      padding: 4px 12px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .skill-category:hover .tag {
+      border-color: rgba(124,58,237,0.3);
+    }
+
+    /* ==============================
+       プロジェクトセクション
+    ============================== */
+    #projects {
+      background: var(--surface);
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .project-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .project-card:hover {
+      border-color: rgba(124,58,237,0.3);
+      transform: translateY(-4px);
+    }
+
+    .project-card:hover::before {
+      opacity: 1;
+    }
+
+    .project-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .project-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-purple { background: rgba(124,58,237,0.15); color: #c4b5fd; }
+    .badge-cyan   { background: rgba(6,182,212,0.12); color: #67e8f9; }
+    .badge-green  { background: rgba(16,185,129,0.12); color: #6ee7b7; }
+    .badge-orange { background: rgba(249,115,22,0.12); color: #fdba74; }
+
+    .project-card h4 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+
+    .project-card p {
+      font-size: 0.92rem;
+      line-height: 1.7;
+      color: #94a3b8;
+      flex: 1;
+      margin-bottom: 24px;
+    }
+
+    .project-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .project-tech span {
+      padding: 3px 10px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    /* フィーチャーカード（1枚幅広） */
+    .project-card.featured {
+      grid-column: span 2;
+      flex-direction: row;
+      gap: 40px;
+    }
+
+    .project-card.featured .project-body {
+      flex: 1;
+    }
+
+    .project-card.featured .project-visual {
+      width: 220px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.08));
+      border-radius: 12px;
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+    }
+
+    /* ==============================
+       コンタクトセクション
+    ============================== */
+    #contact {
+      background: var(--bg);
+    }
+
+    .contact-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .contact-info h3 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .contact-info p {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #94a3b8;
+      margin-bottom: 36px;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-decoration: none;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .contact-link:hover {
+      border-color: rgba(124,58,237,0.4);
+      transform: translateX(4px);
+    }
+
+    .contact-link-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(124,58,237,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .contact-link-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: #a78bfa;
+    }
+
+    .contact-link-body strong {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .contact-link-body span {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* コンタクトフォーム */
+    .contact-form {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-form::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: var(--text);
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: rgba(124,58,237,0.5);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .form-submit {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), #9333ea);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .form-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(124,58,237,0.5);
+    }
+
+    /* ==============================
+       フッター
+    ============================== */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 48px;
+    }
+
+    .footer-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .footer-logo {
+      font-size: 1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .footer-copy {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .footer-socials {
+      display: flex;
+      gap: 12px;
+    }
+
+    .social-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .social-btn:hover {
+      border-color: rgba(124,58,237,0.4);
+      background: rgba(124,58,237,0.08);
+    }
+
+    .social-btn svg {
+      width: 15px;
+      height: 15px;
+      fill: var(--muted);
+    }
+
+    .social-btn:hover svg {
+      fill: #a78bfa;
+    }
+
+    /* ==============================
+       レスポンシブ
+    ============================== */
+    @media (max-width: 900px) {
+      nav {
+        padding: 0 24px;
+      }
+
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: var(--nav-h);
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        gap: 0;
+        background: rgba(8, 8, 15, 0.98);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        padding: 16px 0;
+      }
+
+      .nav-links.open {
+        display: flex;
+      }
+
+      .nav-links li {
+        width: 100%;
+      }
+
+      .nav-links a {
+        display: block;
+        padding: 14px 24px;
+        width: 100%;
+      }
+
+      .nav-cta {
+        margin: 8px 24px;
+        text-align: center;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      section {
+        padding: 80px 24px;
+      }
+
+      .hero {
+        padding: calc(var(--nav-h) + 60px) 24px 60px;
+      }
+
+      .about-grid,
+      .contact-wrapper {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+
+      .skills-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-card.featured {
+        grid-column: span 1;
+        flex-direction: column;
+      }
+
+      .project-card.featured .project-visual {
+        width: 100%;
+        height: 120px;
+      }
+
+      .about-stats {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .hero h1 {
+        font-size: 2.6rem;
+      }
+
+      .about-stats {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      footer {
+        padding: 36px 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==============================
+       ナビゲーション
+  ============================== -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">大室 賢時</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">スキル</a></li>
+      <li><a href="#projects">プロジェクト</a></li>
+      <li><a href="#contact" class="nav-cta">お問い合わせ</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="メニュー">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+
+  <!-- ==============================
+       ヒーローセクション
+  ============================== -->
+  <section class="hero" id="home">
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+      <div class="hero-eyebrow">東京在住 · AIエンジニア</div>
+      <h1>
+        <span class="line-white">人の思考を</span>
+        <span class="line-gradient">AI で拡張する。</span>
+      </h1>
+      <p class="hero-desc">
+        <strong>LLM・生成AI</strong>を活用したプロダクト開発が専門。
+        モデルのファインチューニングからRAGパイプライン構築、
+        エージェントシステムの設計まで、技術で「思考の限界」を超えるプロダクトを作ります。
+      </p>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">
+          <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+          プロジェクトを見る
+        </a>
+        <a href="#contact" class="btn btn-secondary">
+          <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24">
+            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
+          </svg>
+          お問い合わせ
+        </a>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+      SCROLL
+    </div>
+  </section>
+
+  <!-- ==============================
+       アバウトセクション
+  ============================== -->
+  <section id="about">
+    <div class="section-inner">
+      <p class="section-label">About Me</p>
+      <div class="about-grid">
+        <!-- プロフィールカード -->
+        <div class="about-visual">
+          <div class="about-card">
+            <div class="about-avatar">大</div>
+            <div class="about-name">大室 賢時</div>
+            <div class="about-role">AI Engineer / LLM Specialist</div>
+            <div class="about-meta">
+              <div class="meta-item">
+                <!-- 位置アイコン -->
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                Tokyo, Japan
+              </div>
+              <div class="meta-item">
+                <!-- 言語アイコン -->
+                <svg viewBox="0 0 24 24"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+                日本語 · English
+              </div>
+              <div class="meta-item">
+                <!-- ビルドアイコン -->
+                <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.07-.44.18-.86.18-1 0-2.21-1.79-4-4-4s-4 1.79-4 4c0 .14.11.56.18 1H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM14 3c1.1 0 2 .9 2 2 0 .14-.11.56-.18 1h-3.64c-.07-.44-.18-.86-.18-1 0-1.1.9-2 2-2zm-4 8l2 2-2 4h4l-2-4 2-2h-4z"/></svg>
+                フリーランス / 副業受付中
+              </div>
+            </div>
+          </div>
+
+          <!-- 実績カウンター -->
+          <div class="about-stats">
+            <div class="stat-item">
+              <span class="stat-num">50+</span>
+              <span class="stat-label">AIプロジェクト</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num">5年</span>
+              <span class="stat-label">LLM経験</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num">∞</span>
+              <span class="stat-label">好奇心</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 自己紹介テキスト -->
+        <div class="about-content">
+          <h3>AIで「思考の限界」を超える</h3>
+          <p>
+            <strong>LLM・生成AI</strong>を活用したプロダクト開発に5年以上従事。
+            モデルのファインチューニング、RAGパイプラインの設計・実装、
+            マルチエージェントシステムの構築まで幅広く手がけています。
+          </p>
+          <p>
+            単なる技術実装にとどまらず、「どう使えば人の思考が拡張されるか」を
+            常に問いながら開発を進めています。<strong>UXとAIの交点</strong>に
+            強い関心を持ち、エンジニアリングとデザイン思考を組み合わせたプロダクト作りを得意としています。
+          </p>
+          <p>
+            現在はフリーランスとして活動中。新規AIプロダクト開発の<strong>技術顧問・開発パートナー</strong>として
+            スタートアップから大企業まで幅広くご相談を受け付けています。
+          </p>
+          <a href="#contact" class="btn btn-primary" style="margin-top: 8px;">
+            一緒に仕事をする
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==============================
+       スキルセクション
+  ============================== -->
+  <section id="skills">
+    <div class="section-inner">
+      <p class="section-label">Tech Stack</p>
+      <h2 class="section-title">専門領域</h2>
+      <p class="section-desc">
+        AIエンジニアリングの最前線で使われている技術スタックを中心に、
+        フロントからバックエンド、インフラまで一気通貫で担当できます。
+      </p>
+
+      <div class="skills-grid">
+        <!-- LLM / AI -->
+        <div class="skill-category">
+          <div class="skill-icon purple">🤖</div>
+          <h4>LLM / 生成AI</h4>
+          <p>大規模言語モデルの活用・チューニング・評価</p>
+          <div class="skill-tags">
+            <span class="tag">Claude API</span>
+            <span class="tag">OpenAI API</span>
+            <span class="tag">Fine-tuning</span>
+            <span class="tag">RAG</span>
+            <span class="tag">Prompt Engineering</span>
+            <span class="tag">LangChain</span>
+            <span class="tag">LlamaIndex</span>
+          </div>
+        </div>
+
+        <!-- バックエンド -->
+        <div class="skill-category">
+          <div class="skill-icon cyan">⚙️</div>
+          <h4>バックエンド / API</h4>
+          <p>スケーラブルなAIサービスの設計と実装</p>
+          <div class="skill-tags">
+            <span class="tag">Python</span>
+            <span class="tag">FastAPI</span>
+            <span class="tag">Node.js</span>
+            <span class="tag">PostgreSQL</span>
+            <span class="tag">Redis</span>
+            <span class="tag">Docker</span>
+            <span class="tag">AWS</span>
+          </div>
+        </div>
+
+        <!-- フロントエンド -->
+        <div class="skill-category">
+          <div class="skill-icon pink">🎨</div>
+          <h4>フロントエンド</h4>
+          <p>AIプロダクトのUI/UX実装</p>
+          <div class="skill-tags">
+            <span class="tag">TypeScript</span>
+            <span class="tag">React</span>
+            <span class="tag">Next.js</span>
+            <span class="tag">Tailwind CSS</span>
+            <span class="tag">Vercel</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==============================
+       プロジェクトセクション
+  ============================== -->
+  <section id="projects">
+    <div class="section-inner">
+      <p class="section-label">Projects</p>
+      <h2 class="section-title">主なプロジェクト</h2>
+      <p class="section-desc">
+        実際に設計・開発に携わったAIプロダクトの一部をご紹介します。
+      </p>
+
+      <div class="projects-grid">
+        <!-- フィーチャープロジェクト -->
+        <div class="project-card featured">
+          <div class="project-body">
+            <div class="project-header">
+              <span class="project-badge badge-purple">Featured</span>
+            </div>
+            <h4>社内ナレッジAIアシスタント</h4>
+            <p>
+              大企業向けに開発した社内ドキュメント検索・Q&Aシステム。
+              数千件のPDF・Confluenceページをベクトル化し、
+              Claude APIを活用した高精度なRAGパイプラインで
+              従業員の情報探索時間を70%削減。
+            </p>
+            <div class="project-tech">
+              <span>Python</span>
+              <span>Claude API</span>
+              <span>LangChain</span>
+              <span>pgvector</span>
+              <span>FastAPI</span>
+              <span>Next.js</span>
+            </div>
+          </div>
+          <div class="project-visual">🧠</div>
+        </div>
+
+        <!-- プロジェクト2 -->
+        <div class="project-card">
+          <div class="project-header">
+            <span class="project-badge badge-cyan">Agent</span>
+          </div>
+          <h4>AIコードレビューエージェント</h4>
+          <p>
+            GitHubのPRに自動でレビューコメントを付けるマルチエージェントシステム。
+            セキュリティ・パフォーマンス・可読性の3つの観点から分析。
+          </p>
+          <div class="project-tech">
+            <span>Python</span>
+            <span>Claude API</span>
+            <span>GitHub Actions</span>
+            <span>FastAPI</span>
+          </div>
+        </div>
+
+        <!-- プロジェクト3 -->
+        <div class="project-card">
+          <div class="project-header">
+            <span class="project-badge badge-green">SaaS</span>
+          </div>
+          <h4>AIライティング支援ツール</h4>
+          <p>
+            マーケター向けのLPコピー・メール文面生成SaaS。
+            ブランドトーンをファインチューニングで学習させ、
+            一貫したブランドボイスを維持。
+          </p>
+          <div class="project-tech">
+            <span>TypeScript</span>
+            <span>Next.js</span>
+            <span>OpenAI API</span>
+            <span>Stripe</span>
+          </div>
+        </div>
+
+        <!-- プロジェクト4 -->
+        <div class="project-card">
+          <div class="project-header">
+            <span class="project-badge badge-orange">Research</span>
+          </div>
+          <h4>マルチモーダル画像解析API</h4>
+          <p>
+            製造業向けの外観検査AIシステム。
+            Vision LLMによる不良品検知を実装し、
+            既存の検査工程へのシームレスな統合を実現。
+          </p>
+          <div class="project-tech">
+            <span>Python</span>
+            <span>Claude Vision</span>
+            <span>FastAPI</span>
+            <span>Docker</span>
+            <span>AWS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ==============================
+       コンタクトセクション
+  ============================== -->
+  <section id="contact">
+    <div class="section-inner">
+      <p class="section-label">Contact</p>
+      <h2 class="section-title">お問い合わせ</h2>
+      <p class="section-desc">
+        AIプロダクト開発のご相談、技術顧問、副業・フリーランス案件など
+        お気軽にご連絡ください。
+      </p>
+
+      <div class="contact-wrapper">
+        <!-- 連絡先情報 -->
+        <div class="contact-info">
+          <h3>一緒に何か作りましょう</h3>
+          <p>
+            新しいプロジェクトのアイデアをお持ちですか？
+            AIをどう活用すべきか悩んでいますか？
+            まずは気軽にお声がけください。
+          </p>
+          <div class="contact-links">
+            <a href="mailto:kenji@example.com" class="contact-link">
+              <div class="contact-link-icon">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              </div>
+              <div class="contact-link-body">
+                <strong>メール</strong>
+                <span>kenji@example.com</span>
+              </div>
+            </a>
+            <a href="#" class="contact-link">
+              <div class="contact-link-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              </div>
+              <div class="contact-link-body">
+                <strong>GitHub</strong>
+                <span>github.com/kenji-omuro</span>
+              </div>
+            </a>
+            <a href="#" class="contact-link">
+              <div class="contact-link-icon">
+                <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </div>
+              <div class="contact-link-body">
+                <strong>LinkedIn</strong>
+                <span>linkedin.com/in/kenji-omuro</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- お問い合わせフォーム -->
+        <div class="contact-form">
+          <form onsubmit="handleSubmit(event)">
+            <div class="form-group">
+              <label for="name">お名前</label>
+              <input type="text" id="name" placeholder="山田 太郎" required>
+            </div>
+            <div class="form-group">
+              <label for="email">メールアドレス</label>
+              <input type="email" id="email" placeholder="taro@example.com" required>
+            </div>
+            <div class="form-group">
+              <label for="subject">件名</label>
+              <input type="text" id="subject" placeholder="AIプロダクト開発のご相談">
+            </div>
+            <div class="form-group">
+              <label for="message">メッセージ</label>
+              <textarea id="message" placeholder="プロジェクトの概要や相談内容をお書きください..." required></textarea>
+            </div>
+            <button type="submit" class="form-submit">送信する</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================
+       フッター
+  ============================== -->
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo">大室 賢時 / Kenji Omuro</span>
+      <span class="footer-copy">© 2026 Kenji Omuro. All rights reserved.</span>
+      <div class="footer-socials">
+        <a href="#" class="social-btn" aria-label="GitHub">
+          <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="#" class="social-btn" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a href="#" class="social-btn" aria-label="X (Twitter)">
+          <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ハンバーガーメニューの開閉
+    function toggleMenu() {
+      const links = document.getElementById('navLinks');
+      links.classList.toggle('open');
+    }
+
+    // ナビリンクをクリックしたらメニューを閉じる
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('navLinks').classList.remove('open');
+      });
+    });
+
+    // スクロールでナビの背景を濃くする
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('navbar');
+      if (window.scrollY > 40) {
+        nav.style.background = 'rgba(2, 2, 5, 0.95)';
+      } else {
+        nav.style.background = 'rgba(2, 2, 5, 0.8)';
+      }
+    });
+
+    // フォーム送信（デモ）
+    function handleSubmit(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('.form-submit');
+      btn.textContent = '送信しました ✓';
+      btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.textContent = '送信する';
+        btn.style.background = '';
+        btn.disabled = false;
+        e.target.reset();
+      }, 3000);
+    }
+  </script>
+
+</body>
+</html>

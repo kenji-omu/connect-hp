@@ -1,0 +1,11 @@
+# 環境変数（APIキー等を含むため絶対にコミットしない）
+.env
+
+# Node.js 依存パッケージ
+node_modules/
+
+# macOS
+.DS_Store
+
+# エディタ設定
+.vscode/
