@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>connect — 人を繋いで人生を豊かにする</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #7c3aed;
+      --primary2: #a855f7;
+      --cyan: #06b6d4;
+      --pink: #ec4899;
+      --yellow: #fbbf24;
+      --green: #10b981;
+      --bg-dark: #050510;
+      --bg-mid: #0a0a1f;
+      --text: #f1f5f9;
+      /* 読みやすさ向上：ミュートテキストを少し明るく */
+      --muted: #b0bcc8;
+      --glass: rgba(255,255,255,0.06);
+      /* カード用：暗めのネイビー系半透明（約70%） */
+      --card-bg: rgba(6, 6, 22, 0.72);
+      --glass-border: rgba(255,255,255,0.14);
+      --nav-h: 72px;
+      --max-w: 1200px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text);
+      font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', system-ui, sans-serif;
+      overflow-x: hidden;
+      line-height: 1.7;
+      /* 本文全体をやや太く */
+      font-weight: 450;
+    }
+
+    /* ==============================
+       星空キャンバス
+    ============================== */
+    #stars-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ==============================
+       ナビゲーション
+    ============================== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      background: rgba(5, 5, 16, 0.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .nav-logo {
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--cyan), var(--primary2), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: linear-gradient(135deg, var(--primary), var(--pink));
+      color: #fff !important;
+      padding: 10px 24px;
+      border-radius: 100px;
+      font-weight: 700 !important;
+      transition: opacity 0.2s, transform 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+    }
+
+    /* ハンバーガー */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    /* ==============================
+       ヒーロー
+    ============================== */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: calc(var(--nav-h) + 40px) 24px 80px;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    /* 光のオーブ */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(124,58,237,0.35), transparent 70%);
+      top: -100px; left: -150px;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(6,182,212,0.3), transparent 70%);
+      top: 20%; right: -100px;
+      animation-delay: -3s;
+    }
+
+    .orb-3 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(236,72,153,0.25), transparent 70%);
+      bottom: 0; left: 30%;
+      animation-delay: -5s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    /* ヒーローテキストをまとめる半透明ボックス：透明度を下げてコントラスト確保 */
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      background: rgba(3, 3, 14, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 32px;
+      padding: 56px 64px;
+      max-width: 820px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      border-radius: 100px;
+      padding: 8px 20px;
+      font-size: 0.82rem;
+      color: var(--cyan);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 8px; height: 8px;
+      background: var(--cyan);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .hero-title {
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      position: relative;
+      z-index: 2;
+      margin-bottom: 8px;
+      /* シャープなシャドウのみ：にじみを防ぎクッキリ見せる */
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95));
+    }
+
+    .hero-title .gradient-text {
+      /* 白始まり比率を上げて全体的に明るく、コントラスト最大化 */
+      background: linear-gradient(135deg, #ffffff 0%, #e0f8ff 25%, var(--cyan) 50%, var(--primary2) 75%, #f9a8d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      /* 青白系の高コントラスト色 */
+      color: #e8edf5;
+      margin-top: 20px;
+      margin-bottom: 48px;
+      position: relative;
+      z-index: 2;
+      max-width: 560px;
+      font-weight: 600;
+      /* シャープで薄いシャドウ：にじまず輪郭を際立たせる */
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero-sub strong {
+      color: #ffffff;
+      font-weight: 800;
+      /* strongには細いアウトライン的シャドウ */
+      text-shadow: 0 0 1px rgba(255,255,255,0.8), 0 1px 4px rgba(0, 0, 0, 0.9);
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--pink));
+      color: #fff;
+      text-decoration: none;
+      padding: 16px 36px;
+      border-radius: 100px;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 32px rgba(124,58,237,0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 48px rgba(124,58,237,0.5);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--glass);
+      color: var(--text);
+      text-decoration: none;
+      padding: 16px 36px;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 1rem;
+      border: 1px solid var(--glass-border);
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-3px);
+    }
+
+    /* スクロールインジケーター */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 2;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+    }
+
+    .scroll-indicator .line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, var(--primary2), transparent);
+      animation: scrollLine 1.5s ease-in-out infinite;
+    }
+
+    @keyframes scrollLine {
+      0% { transform: scaleY(0); transform-origin: top; }
+      50% { transform: scaleY(1); transform-origin: top; }
+      51% { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ==============================
+       共通セクション
+    ============================== */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 120px 24px;
+    }
+
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 16px;
+      text-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      /* 見出しに強めのドロップシャドウ */
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      /* より読みやすい明度に引き上げ */
+      color: #c2cbd8;
+      max-width: 540px;
+      margin-bottom: 64px;
+      font-weight: 500;
+      line-height: 1.85;
+    }
+
+    /* グラスカード */
+    .glass-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(12px);
+      transition: transform 0.3s, border-color 0.3s, background 0.3s;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.09);
+    }
+
+    /* ==============================
+       ミッション・ビジョン・バリュー
+    ============================== */
+    #mission {
+      background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-mid) 100%);
+    }
+
+    .mvv-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .mvv-card {
+      /* 暗めのネイビー系背景で文字を浮き立たせる */
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 48px 36px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .mvv-card:hover { transform: translateY(-8px); }
+
+    .mvv-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+    }
+
+    .mvv-card.mission::before { background: linear-gradient(90deg, var(--cyan), var(--primary2)); }
+    .mvv-card.vision::before  { background: linear-gradient(90deg, var(--primary2), var(--pink)); }
+    .mvv-card.value::before   { background: linear-gradient(90deg, var(--pink), var(--yellow)); }
+
+    .mvv-icon {
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 24px;
+    }
+
+    .mission .mvv-icon { background: rgba(6,182,212,0.15); }
+    .vision .mvv-icon  { background: rgba(168,85,247,0.15); }
+    .value .mvv-icon   { background: rgba(236,72,153,0.15); }
+
+    .mvv-card h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .mvv-card p {
+      font-size: 1.2rem;
+      font-weight: 800;
+      line-height: 1.5;
+      color: #ffffff;
+      margin-bottom: 12px;
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    .mvv-card .detail {
+      font-size: 0.92rem;
+      color: #c0c8d6;
+      font-weight: 500;
+      line-height: 1.8;
+    }
+
+    /* ==============================
+       サービス
+    ============================== */
+    #services {
+      background: var(--bg-mid);
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .service-card {
+      /* サービスカードも暗いベースで文字を際立たせる */
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 40px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s;
+      cursor: default;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .service-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255,255,255,0.25);
+    }
+
+    /* ホバー時のグロー */
+    .service-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .service-card:hover::after { opacity: 1; }
+
+    .service-card:nth-child(1)::after { box-shadow: inset 0 0 40px rgba(6,182,212,0.08); }
+    .service-card:nth-child(2)::after { box-shadow: inset 0 0 40px rgba(168,85,247,0.08); }
+    .service-card:nth-child(3)::after { box-shadow: inset 0 0 40px rgba(236,72,153,0.08); }
+    .service-card:nth-child(4)::after { box-shadow: inset 0 0 40px rgba(251,191,36,0.08); }
+    .service-card:nth-child(5)::after { box-shadow: inset 0 0 40px rgba(16,185,129,0.08); }
+    .service-card:nth-child(6)::after { box-shadow: inset 0 0 40px rgba(124,58,237,0.08); }
+
+    .service-num {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .service-icon {
+      font-size: 2.4rem;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .service-card h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+      color: #fff;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .service-card p {
+      font-size: 0.92rem;
+      /* ミュートより明るい色 */
+      color: #bdc6d2;
+      line-height: 1.85;
+      font-weight: 500;
+    }
+
+    .service-tag {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .tag-cyan  { background: rgba(6,182,212,0.15);  color: var(--cyan); }
+    .tag-purple{ background: rgba(168,85,247,0.15); color: var(--primary2); }
+    .tag-pink  { background: rgba(236,72,153,0.15); color: var(--pink); }
+    .tag-yellow{ background: rgba(251,191,36,0.15); color: var(--yellow); }
+    .tag-green { background: rgba(16,185,129,0.15); color: var(--green); }
+    .tag-mix   { background: rgba(124,58,237,0.15); color: var(--primary2); }
+
+    /* ==============================
+       会社概要
+    ============================== */
+    #company {
+      background: linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-dark) 100%);
+    }
+
+    .company-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .company-visual {
+      position: relative;
+      height: 420px;
+      border-radius: 32px;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.2));
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .company-visual .planet {
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--cyan));
+      box-shadow: 0 0 80px rgba(124,58,237,0.5), 0 0 160px rgba(6,182,212,0.2);
+      position: relative;
+      animation: rotatePlanet 20s linear infinite;
+    }
+
+    .company-visual .planet::after {
+      content: '';
+      position: absolute;
+      width: 280px; height: 60px;
+      border-radius: 50%;
+      border: 3px solid rgba(251,191,36,0.4);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotateX(70deg);
+      box-shadow: 0 0 20px rgba(251,191,36,0.2);
+    }
+
+    @keyframes rotatePlanet {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .company-visual .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.05);
+      animation: expandRing 4s ease-in-out infinite;
+    }
+
+    .company-visual .ring:nth-child(2) { width: 300px; height: 300px; animation-delay: 0s; }
+    .company-visual .ring:nth-child(3) { width: 380px; height: 380px; animation-delay: 1s; }
+    .company-visual .ring:nth-child(4) { width: 460px; height: 460px; animation-delay: 2s; }
+
+    @keyframes expandRing {
+      0%, 100% { opacity: 0.3; transform: scale(0.95); }
+      50% { opacity: 0.08; transform: scale(1); }
+    }
+
+    .company-table {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .company-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 20px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--glass-border);
+      align-items: start;
+    }
+
+    .company-row:first-child { border-top: 1px solid var(--glass-border); }
+
+    .company-row dt {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      padding-top: 2px;
+    }
+
+    .company-row dd {
+      font-size: 0.95rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* ==============================
+       ニュース
+    ============================== */
+    #news {
+      background: var(--bg-dark);
+    }
+
+    .news-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .news-item {
+      display: grid;
+      grid-template-columns: auto auto 1fr auto;
+      gap: 24px;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 24px 32px;
+      text-decoration: none;
+      color: var(--text);
+      transition: background 0.2s, transform 0.2s, border-color 0.2s;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .news-item:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateX(8px);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .news-date {
+      font-size: 0.82rem;
+      color: var(--muted);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .news-category {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .cat-pr      { background: rgba(6,182,212,0.15);  color: var(--cyan); }
+    .cat-service { background: rgba(168,85,247,0.15); color: var(--primary2); }
+    .cat-media   { background: rgba(236,72,153,0.15); color: var(--pink); }
+    .cat-award   { background: rgba(251,191,36,0.15); color: var(--yellow); }
+
+    .news-title {
+      font-size: 0.97rem;
+      font-weight: 600;
+      color: #e8edf3;
+    }
+
+    .news-arrow {
+      color: var(--muted);
+      font-size: 1.1rem;
+      transition: transform 0.2s, color 0.2s;
+    }
+
+    .news-item:hover .news-arrow {
+      transform: translateX(4px);
+      color: var(--text);
+    }
+
+    /* ==============================
+       お問い合わせ
+    ============================== */
+    #contact {
+      background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-mid) 100%);
+    }
+
+    .contact-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .contact-info h2 {
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.7);
+    }
+
+    .contact-info p {
+      color: #c0c8d6;
+      font-size: 0.97rem;
+      line-height: 1.9;
+      margin-bottom: 40px;
+      font-weight: 500;
+    }
+
+    .contact-point {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .contact-point .icon {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .contact-point:nth-child(1) .icon { background: rgba(6,182,212,0.15); }
+    .contact-point:nth-child(2) .icon { background: rgba(168,85,247,0.15); }
+    .contact-point:nth-child(3) .icon { background: rgba(236,72,153,0.15); }
+
+    .contact-point span {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* フォーム */
+    .contact-form {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 48px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+    }
+
+    .form-group .req {
+      color: var(--pink);
+      margin-left: 4px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary2);
+      background: rgba(168,85,247,0.06);
+    }
+
+    .form-group select option { background: #1a1a35; }
+
+    .form-group textarea {
+      height: 140px;
+      resize: vertical;
+    }
+
+    .form-submit {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--pink));
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+      margin-top: 8px;
+      box-shadow: 0 8px 24px rgba(124,58,237,0.35);
+    }
+
+    .form-submit:hover {
+      opacity: 0.88;
+      transform: translateY(-2px);
+    }
+
+    /* ==============================
+       フッター
+    ============================== */
+    footer {
+      position: relative;
+      z-index: 1;
+      background: var(--bg-mid);
+      border-top: 1px solid var(--glass-border);
+      padding: 64px 24px 40px;
+    }
+
+    .footer-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+
+    .footer-brand .logo {
+      font-size: 1.6rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--cyan), var(--primary2), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+
+    .footer-brand p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .footer-col h4 {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer-col a {
+      font-size: 0.88rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-col a:hover { color: var(--text); }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 32px;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .footer-bottom p {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .footer-sns {
+      display: flex;
+      gap: 12px;
+    }
+
+    .sns-btn {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 1rem;
+      color: var(--muted);
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+    }
+
+    .sns-btn:hover {
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
+      transform: translateY(-3px);
+    }
+
+    /* ==============================
+       スクロールアニメーション
+    ============================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==============================
+       モバイル対応
+    ============================== */
+    @media (max-width: 1024px) {
+      .mvv-grid { grid-template-columns: 1fr; }
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      .company-layout { grid-template-columns: 1fr; gap: 48px; }
+      .company-visual { height: 280px; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+
+      /* モバイルではヒーローボックスのパディングを縮小 */
+      .hero-content { padding: 36px 24px; }
+
+      section { padding: 80px 20px; }
+
+      .services-grid { grid-template-columns: 1fr; }
+
+      .news-item {
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto;
+        gap: 12px;
+      }
+
+      .news-date { grid-column: 1; grid-row: 1; }
+      .news-category { grid-column: 2; grid-row: 1; justify-self: start; }
+      .news-title { grid-column: 1 / -1; grid-row: 2; }
+      .news-arrow { display: none; }
+
+      .contact-wrap { grid-template-columns: 1fr; gap: 40px; }
+      .form-row { grid-template-columns: 1fr; }
+      .contact-form { padding: 28px 20px; }
+
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-btns { flex-direction: column; align-items: center; }
+      .footer-top { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 星空キャンバス -->
+<canvas id="stars-canvas"></canvas>
+
+<!-- ==============================
+     ナビゲーション
+============================== -->
+<nav>
+  <div class="nav-logo">connect</div>
+  <ul class="nav-links">
+    <li><a href="#mission">ミッション</a></li>
+    <li><a href="#services">サービス</a></li>
+    <li><a href="#company">会社概要</a></li>
+    <li><a href="#news">ニュース</a></li>
+    <li><a href="#contact" class="nav-cta">お問い合わせ</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="メニュー">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ==============================
+     ヒーロー
+============================== -->
+<section id="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- ヒーローテキスト：暗めの半透明ボックスで可読性を確保 -->
+  <div class="hero-content">
+    <div class="hero-badge">AI × Business Innovation</div>
+
+    <h1 class="hero-title">
+      <span class="gradient-text">人を繋いで</span><br>
+      <span class="gradient-text">人生を豊かにする</span>
+    </h1>
+
+    <p class="hero-sub">
+      <strong>connect</strong> は、AIの力で業務を革新し、<br>
+      人と人・企業と未来を繋ぐテクノロジー企業です。
+    </p>
+
+    <div class="hero-btns">
+      <a href="#services" class="btn-primary">サービスを見る →</a>
+      <a href="#contact" class="btn-secondary">お問い合わせ</a>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <div class="line"></div>
+    <span>SCROLL</span>
+  </div>
+</section>
+
+<!-- ==============================
+     ミッション・ビジョン・バリュー
+============================== -->
+<section id="mission">
+  <div class="container">
+    <p class="section-label reveal">Our Philosophy</p>
+    <h2 class="section-title reveal">私たちの想い</h2>
+    <p class="section-desc reveal">テクノロジーで人と人を繋ぎ、すべての人の可能性を広げる社会を目指しています。</p>
+
+    <div class="mvv-grid">
+      <div class="mvv-card mission reveal">
+        <div class="mvv-icon">🎯</div>
+        <h3>Mission</h3>
+        <p>人を繋いで、人生を豊かにする</p>
+        <div class="detail">AIと人間の力を融合させ、一人ひとりの仕事と生活をより豊かにするサービスを提供し続けます。</div>
+      </div>
+
+      <div class="mvv-card vision reveal">
+        <div class="mvv-icon">🚀</div>
+        <h3>Vision</h3>
+        <p>AIで、すべての業務を変える</p>
+        <div class="detail">2030年までに、日本の中小企業・大企業を問わず、あらゆる業務プロセスにAIを実装し、生産性を根本から変革します。</div>
+      </div>
+
+      <div class="mvv-card value reveal">
+        <div class="mvv-icon">💡</div>
+        <h3>Value</h3>
+        <p>繋ぐ・革新する・共創する</p>
+        <div class="detail">人と技術、企業とユーザー、現在と未来——あらゆる「繋がり」の中に価値を生み出すことが私たちの行動原則です。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==============================
+     サービス
+============================== -->
+<section id="services">
+  <div class="container">
+    <p class="section-label reveal">Services</p>
+    <h2 class="section-title reveal">AIで、業務を変える</h2>
+    <p class="section-desc reveal">connectは6つのコアサービスで、あなたのビジネスの課題を解決します。</p>
+
+    <div class="services-grid">
+
+      <div class="service-card reveal">
+        <div class="service-num">01</div>
+        <span class="service-icon">🤖</span>
+        <h3>AIチャットボット開発</h3>
+        <p>顧客対応・社内問い合わせを24時間自動化。LLMを活用した高精度の対話AIを、貴社のブランドに合わせてカスタム開発します。</p>
+        <span class="service-tag tag-cyan">Chatbot / LLM</span>
+      </div>
+
+      <div class="service-card reveal">
+        <div class="service-num">02</div>
+        <span class="service-icon">⚙️</span>
+        <h3>業務自動化（RPA）</h3>
+        <p>繰り返しの手作業をロボットが代行。データ入力・集計・メール送信など、定型業務を自動化し、社員がコア業務に集中できる環境を実現します。</p>
+        <span class="service-tag tag-purple">RPA / Automation</span>
+      </div>
+
+      <div class="service-card reveal">
+        <div class="service-num">03</div>
+        <span class="service-icon">📊</span>
+        <h3>データ分析・AI導入コンサル</h3>
+        <p>蓄積したデータをAIで可視化・予測分析。課題発見から導入設計、運用定着まで一貫してサポートします。</p>
+        <span class="service-tag tag-pink">Analytics / Consulting</span>
+      </div>
+
+      <div class="service-card reveal">
+        <div class="service-num">04</div>
+        <span class="service-icon">💼</span>
+        <h3>営業の自動化</h3>
+        <p>リード獲得からナーチャリング、商談設定までAIが自動対応。営業チームの負担を大幅に削減しながら、商談数と成約率を向上させます。</p>
+        <span class="service-tag tag-yellow">Sales AI / CRM</span>
+      </div>
+
+      <div class="service-card reveal">
+        <div class="service-num">05</div>
+        <span class="service-icon">🧠</span>
+        <h3>社内ナレッジAI</h3>
+        <p>社内文書・マニュアル・議事録を学習させたAIアシスタントを構築。「誰に聞けばいい？」をAIが即答する、次世代の社内検索基盤です。</p>
+        <span class="service-tag tag-green">Knowledge / RAG</span>
+      </div>
+
+      <div class="service-card reveal">
+        <div class="service-num">06</div>
+        <span class="service-icon">🔗</span>
+        <h3>AIシステム連携・API開発</h3>
+        <p>既存システムへのAI機能追加やSaaS間のデータ連携をAPI開発で実現。スクラッチ不要で、スピーディにAI化を進めます。</p>
+        <span class="service-tag tag-mix">API / Integration</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==============================
+     会社概要
+============================== -->
+<section id="company">
+  <div class="container">
+    <div class="company-layout">
+      <div>
+        <p class="section-label reveal">About Us</p>
+        <h2 class="section-title reveal">会社概要</h2>
+
+        <dl class="company-table">
+          <div class="company-row reveal">
+            <dt>会社名</dt>
+            <dd>株式会社 connect</dd>
+          </div>
+          <div class="company-row reveal">
+            <dt>代表取締役</dt>
+            <dd>大室 賢時</dd>
+          </div>
+          <div class="company-row reveal">
+            <dt>設立</dt>
+            <dd>2023年4月（予定）</dd>
+          </div>
+          <div class="company-row reveal">
+            <dt>所在地</dt>
+            <dd>東京都</dd>
+          </div>
+          <div class="company-row reveal">
+            <dt>資本金</dt>
+            <dd>1,000万円（予定）</dd>
+          </div>
+          <div class="company-row reveal">
+            <dt>従業員数</dt>
+            <dd>10名（予定）</dd>
+          </div>
+          <div class="company-row reveal">
+            <dt>事業内容</dt>
+            <dd>AI業務効率化ソリューションの開発・提供<br>AIコンサルティング・システム開発</dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- 惑星ビジュアル -->
+      <div class="company-visual reveal">
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="planet"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==============================
+     ニュース
+============================== -->
+<section id="news">
+  <div class="container">
+    <p class="section-label reveal">News</p>
+    <h2 class="section-title reveal">ニュース</h2>
+
+    <div class="news-grid">
+
+      <a href="#" class="news-item reveal">
+        <span class="news-date">2025.12.10</span>
+        <span class="news-category cat-pr">プレスリリース</span>
+        <span class="news-title">株式会社connectを設立しました</span>
+        <span class="news-arrow">→</span>
+      </a>
+
+      <a href="#" class="news-item reveal">
+        <span class="news-date">2026.01.15</span>
+        <span class="news-category cat-service">サービス</span>
+        <span class="news-title">AIチャットボット開発サービス「connect Chat」の提供を開始</span>
+        <span class="news-arrow">→</span>
+      </a>
+
+      <a href="#" class="news-item reveal">
+        <span class="news-date">2026.02.03</span>
+        <span class="news-category cat-media">メディア</span>
+        <span class="news-title">日経クロステックにて「AIで業務革新を起こすスタートアップ」として取材掲載</span>
+        <span class="news-arrow">→</span>
+      </a>
+
+      <a href="#" class="news-item reveal">
+        <span class="news-date">2026.02.28</span>
+        <span class="news-category cat-service">サービス</span>
+        <span class="news-title">営業自動化ソリューション「connect Sales」β版リリース</span>
+        <span class="news-arrow">→</span>
+      </a>
+
+      <a href="#" class="news-item reveal">
+        <span class="news-date">2026.03.20</span>
+        <span class="news-category cat-award">受賞</span>
+        <span class="news-title">「AIスタートアップアワード2026」にて優秀賞を受賞</span>
+        <span class="news-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==============================
+     お問い合わせ
+============================== -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-wrap">
+
+      <div class="contact-info">
+        <p class="section-label reveal">Contact</p>
+        <h2 class="reveal">まずは<br>お気軽に<br>ご相談ください</h2>
+        <p class="reveal">サービスのご質問・お見積もり・資料請求など、どんなことでも遠慮なくご連絡ください。通常1営業日以内にご返信します。</p>
+
+        <div class="contact-point reveal">
+          <div class="icon">⚡</div>
+          <span>最短1営業日でご返信</span>
+        </div>
+        <div class="contact-point reveal">
+          <div class="icon">🎯</div>
+          <span>初回相談は無料</span>
+        </div>
+        <div class="contact-point reveal">
+          <div class="icon">🤝</div>
+          <span>中小〜大企業まで対応可能</span>
+        </div>
+      </div>
+
+      <div class="contact-form reveal">
+        <form id="contact-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>お名前<span class="req">*</span></label>
+              <input type="text" placeholder="山田 太郎" required>
+            </div>
+            <div class="form-group">
+              <label>会社名</label>
+              <input type="text" placeholder="株式会社〇〇">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>メールアドレス<span class="req">*</span></label>
+            <input type="email" placeholder="example@company.com" required>
+          </div>
+
+          <div class="form-group">
+            <label>お問い合わせ種別<span class="req">*</span></label>
+            <select required>
+              <option value="">選択してください</option>
+              <option>サービスについて</option>
+              <option>お見積もり依頼</option>
+              <option>資料請求</option>
+              <option>取材・メディア</option>
+              <option>その他</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>ご相談内容<span class="req">*</span></label>
+            <textarea placeholder="ご質問・ご相談内容をご記入ください" required></textarea>
+          </div>
+
+          <button type="submit" class="form-submit">送信する →</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==============================
+     フッター
+============================== -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">connect</div>
+        <p>AIで人を繋ぎ、<br>業務と人生を豊かにする<br>テクノロジー企業</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>サービス</h4>
+        <ul>
+          <li><a href="#services">AIチャットボット</a></li>
+          <li><a href="#services">業務自動化（RPA）</a></li>
+          <li><a href="#services">データ分析・コンサル</a></li>
+          <li><a href="#services">営業の自動化</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>会社情報</h4>
+        <ul>
+          <li><a href="#mission">ミッション</a></li>
+          <li><a href="#company">会社概要</a></li>
+          <li><a href="#news">ニュース</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>お問い合わせ</h4>
+        <ul>
+          <li><a href="#contact">お問い合わせフォーム</a></li>
+          <li><a href="#">プライバシーポリシー</a></li>
+          <li><a href="#">利用規約</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2025 株式会社 connect. All rights reserved.</p>
+      <div class="footer-sns">
+        <a href="#" class="sns-btn" aria-label="X(Twitter)">𝕏</a>
+        <a href="#" class="sns-btn" aria-label="LinkedIn">in</a>
+        <a href="#" class="sns-btn" aria-label="Note">n</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+  // ==============================
+  // 星空アニメーション
+  // ==============================
+  const canvas = document.getElementById('stars-canvas');
+  const ctx = canvas.getContext('2d');
+
+  let stars = [];
+  const STAR_COUNT = 220;
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < STAR_COUNT; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.5 + 0.2,
+        // ランダムな色（シアン・パープル・ピンク・ホワイト）
+        hue: [200, 270, 320, 0][Math.floor(Math.random() * 4)],
+        alpha: Math.random() * 0.7 + 0.1,
+        speed: Math.random() * 0.3 + 0.05,
+        twinkle: Math.random() * Math.PI * 2,
+        twinkleSpeed: Math.random() * 0.02 + 0.005,
+      });
+    }
+  }
+
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const s of stars) {
+      s.twinkle += s.twinkleSpeed;
+      const alpha = s.alpha * (0.5 + 0.5 * Math.sin(s.twinkle));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${s.hue}, 80%, 80%, ${alpha})`;
+      ctx.fill();
+
+      // 一部の星に光芒
+      if (s.r > 1.2) {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${s.hue}, 90%, 90%, ${alpha * 0.12})`;
+        ctx.fill();
+      }
+
+      // ゆっくり流れる
+      s.y += s.speed * 0.1;
+      if (s.y > canvas.height) {
+        s.y = 0;
+        s.x = Math.random() * canvas.width;
+      }
+    }
+    requestAnimationFrame(drawStars);
+  }
+
+  window.addEventListener('resize', () => {
+    resize();
+    initStars();
+  });
+  resize();
+  initStars();
+  drawStars();
+
+  // ==============================
+  // スクロールアニメーション
+  // ==============================
+  const reveals = document.querySelectorAll('.reveal');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        // 少し遅延をずらして順番に表示
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, (entry.target.dataset.delay || 0) * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  // 同一セクション内で順番に遅延
+  document.querySelectorAll('section').forEach(sec => {
+    const items = sec.querySelectorAll('.reveal');
+    items.forEach((el, i) => { el.dataset.delay = i; });
+  });
+
+  reveals.forEach(el => observer.observe(el));
+
+  // ==============================
+  // ハンバーガーメニュー（モバイル）
+  // ==============================
+  const hamburger = document.getElementById('hamburger');
+  const navLinks  = document.querySelector('.nav-links');
+
+  hamburger.addEventListener('click', () => {
+    const open = navLinks.style.display === 'flex';
+    if (open) {
+      navLinks.style.display = 'none';
+    } else {
+      navLinks.style.display = 'flex';
+      navLinks.style.flexDirection = 'column';
+      navLinks.style.position = 'absolute';
+      navLinks.style.top = '72px';
+      navLinks.style.left = '0';
+      navLinks.style.right = '0';
+      navLinks.style.background = 'rgba(5,5,16,0.97)';
+      navLinks.style.padding = '24px 40px';
+      navLinks.style.gap = '20px';
+      navLinks.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+    }
+  });
+
+  // ナビリンクをクリックしたらメニューを閉じる
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        navLinks.style.display = 'none';
+      }
+    });
+  });
+
+  // ==============================
+  // フォーム送信（デモ）
+  // ==============================
+  document.getElementById('contact-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('.form-submit');
+    btn.textContent = '送信完了 ✓';
+    btn.style.background = 'linear-gradient(135deg, #10b981, #06b6d4)';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = '送信する →';
+      btn.style.background = '';
+      btn.disabled = false;
+      e.target.reset();
+    }, 3000);
+  });
+</script>
+
+</body>
+</html>
