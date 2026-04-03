@@ -31,13 +31,13 @@
       --max-w: 1200px;
     }
 
-    html { scroll-behavior: smooth; }
+    /* overflow-x: hidden は html に設定することで iOS Safari のアンカーリンク無効化バグを回避 */
+    html { scroll-behavior: smooth; overflow-x: hidden; }
 
     body {
       background: var(--bg-dark);
       color: var(--text);
       font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', system-ui, sans-serif;
-      overflow-x: hidden;
       line-height: 1.7;
       /* 本文全体をやや太く */
       font-weight: 450;
@@ -285,6 +285,7 @@
     .btn-primary {
       display: inline-flex;
       align-items: center;
+      touch-action: manipulation; /* スマホのタップ遅延を解消 */
       gap: 8px;
       background: linear-gradient(135deg, var(--primary), var(--pink));
       color: #fff;
@@ -305,6 +306,7 @@
     .btn-secondary {
       display: inline-flex;
       align-items: center;
+      touch-action: manipulation; /* スマホのタップ遅延を解消 */
       gap: 8px;
       background: var(--glass);
       color: var(--text);
