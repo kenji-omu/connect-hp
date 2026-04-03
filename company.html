@@ -1119,13 +1119,22 @@
       transform: translateY(20px) scale(0.95);
       opacity: 0;
       pointer-events: none;
-      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
+      /* iOS Safari では backdrop-filter 要素が pointer-events: none でもタッチを吸収するバグがある
+         visibility: hidden で確実にタッチを無効化し、0.3s後（アニメ完了後）に隠す */
+      visibility: hidden;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1),
+                  opacity 0.25s ease,
+                  visibility 0s 0.3s;
     }
 
     .chat-panel.open {
       transform: translateY(0) scale(1);
       opacity: 1;
       pointer-events: all;
+      visibility: visible;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1),
+                  opacity 0.25s ease,
+                  visibility 0s 0s; /* 開く時はすぐ表示 */
     }
 
     /* ヘッダー */
