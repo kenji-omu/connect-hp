@@ -31,13 +31,13 @@
       --max-w: 1200px;
     }
 
-    /* overflow-x: hidden は html に設定することで iOS Safari のアンカーリンク無効化バグを回避 */
-    html { scroll-behavior: smooth; overflow-x: hidden; }
+    html { scroll-behavior: smooth; }
 
     body {
       background: var(--bg-dark);
       color: var(--text);
       font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', system-ui, sans-serif;
+      overflow-x: hidden;
       line-height: 1.7;
       /* 本文全体をやや太く */
       font-weight: 450;
@@ -1739,6 +1739,26 @@
 
 <script>
   // ==============================
+  // アンカーリンクのスムーズスクロール（iOS Safari対応）
+  // CSS の scroll-behavior だけでは iOS Safari で動かないケースがあるため JS で処理
+  // ==============================
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a[href^="#"]');
+    if (!link) return;
+    const id = link.getAttribute('href').slice(1);
+    if (!id) return;
+    const target = document.getElementById(id);
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // ハンバーガーメニューが開いていれば閉じる
+    const navLinks = document.querySelector('.nav-links');
+    if (navLinks && window.innerWidth <= 768) {
+      navLinks.style.display = 'none';
+    }
+  });
+
+  // ==============================
   // 星空アニメーション
   // ==============================
   const canvas = document.getElementById('stars-canvas');
@@ -1854,14 +1874,7 @@
     }
   });
 
-  // ナビリンクをクリックしたらメニューを閉じる
-  navLinks.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => {
-      if (window.innerWidth <= 768) {
-        navLinks.style.display = 'none';
-      }
-    });
-  });
+  // ナビリンクのメニュー閉じ処理はアンカースクロールのグローバルハンドラに統合済み
 
   // ==============================
   // フォーム送信（デモ）
